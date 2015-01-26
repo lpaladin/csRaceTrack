@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace csRaceTrack
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        private ListViewItem Trace2Row(int id, Trace trace)
+        private static ListViewItem Trace2Row(int id, Trace trace)
         {
             ListViewItem item = new ListViewItem();
             item.SubItems[0].Text = id.ToString();
@@ -54,10 +55,12 @@ namespace csRaceTrack
             return item;
         }
 
+        int currTraceFileID = 0;
         private void btnBrowse_Click(object sender, EventArgs e)
         {
             if (ofdTrace.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                currTraceFileID = 0;
                 btnReset_Click(null, null);
             }
         }
@@ -67,6 +70,7 @@ namespace csRaceTrack
             cmbImplement.Enabled = false;
             chkCountMissShifts.Enabled = false;
             chkFastMode.Enabled = false;
+            chkExternalCacheInfo.Enabled = false;
             RaceTrackLogic logic = cmbImplement.SelectedItem as RaceTrackLogic;
             try
             {
@@ -131,11 +135,11 @@ namespace csRaceTrack
                 lstLog.Items.Clear();
                 lstTrace.Items.Clear();
             }
-            if (File.Exists(ofdTrace.FileName))
+            if (File.Exists(ofdTrace.FileNames[currTraceFileID]))
             {
-                txtPath.Text = ofdTrace.FileName;
+                txtPath.Text = string.Format("【第{0}个文件，共{1}个文件】", currTraceFileID + 1, ofdTrace.FileNames.Length) + ofdTrace.FileNames[currTraceFileID];
                 traces = new Queue<Trace>();
-                fs = ofdTrace.OpenFile();
+                fs = new FileStream(ofdTrace.FileNames[currTraceFileID], FileMode.Open);
                 bs = new BufferedStream(fs);
                 srTraceReader = new StreamReader(bs);
                 for (traceCount = 0; traceCount < TRACE_WINDOW_SIZE / 2 && !srTraceReader.EndOfStream; traceCount++)
@@ -162,6 +166,50 @@ namespace csRaceTrack
             lblShiftCount.Text = "移动次数：" + shiftCount;
             lblRWCount.Text = "读写次数：" + rwCount;
 
+            if (inComparisionMode)
+            {
+                compareResults[cmp_currentLogicID + chklstComparedImplementations.CheckedIndices.Count * currTraceFileID] = new Result
+                {
+                    implementationName = RaceTrackLogic.currentLogic.ToString(),
+                    shiftCount = shiftCount,
+                    rwCount = rwCount,
+                    readMissCount = readMissCount,
+                    traceName = Path.GetFileName(ofdTrace.FileNames[currTraceFileID])
+                };
+                if (chklstComparedImplementations.CheckedIndices.Count > cmp_currentLogicID + 1)
+                {
+                    cmp_currentLogicID++;
+                    cmbImplement.SelectedIndex = chklstComparedImplementations.CheckedIndices[cmp_currentLogicID];
+                    btnReset_Click(null, null);
+                    btnPlay_Click(null, null);
+                    return;
+                }
+                else if (currTraceFileID + 1 < ofdTrace.FileNames.Length)
+                {
+                    currTraceFileID++;
+                    cmp_currentLogicID = 0;
+                    cmbImplement.SelectedIndex = chklstComparedImplementations.CheckedIndices[cmp_currentLogicID];
+                    btnReset_Click(null, null);
+                    btnPlay_Click(null, null);
+                }
+                else
+                {
+                    Log("实验完成。结果如下：");
+                    foreach (Result r in compareResults)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(r.traceName).Append('\t')
+                            .Append(r.implementationName).Append('\t')
+                            .Append(r.shiftCount).Append('\t')
+                            .Append(r.rwCount).Append('\t')
+                            .Append(r.readMissCount);
+                        Log(sb.ToString());
+                    }
+                    btnCompareBegin.Enabled = true;
+                    chklstComparedImplementations.Enabled = true;
+                }
+            }
+
             btnPlay.Text = "运行";
             btnStep.Enabled = false;
             btnPlay.Enabled = false;
@@ -177,18 +225,26 @@ namespace csRaceTrack
                 if (fastPlayInProgress)
                 {
                     requestFastPlayEnd = true;
+                    inComparisionMode = false;
                     btnPlay.Text = "运行";
                     btnStep.Enabled = true;
                     btnReset.Enabled = true;
+                    btnCompareBegin.Enabled = true;
+                    chklstComparedImplementations.Enabled = true;
                 }
                 else
                 {
+                    btnReset_Click(null, null);
                     Log("模拟开始！请耐心等待或点击“暂停”来结束。");
                     lstTrace.Items.Clear();
                     fastPlayInProgress = true;
                     requestFastPlayEnd = false;
                     btnPlay.Text = "暂停";
                     btnStep.Enabled = false;
+                    cmbImplement.Enabled = false;
+                    chkFastMode.Enabled = false;
+                    chkExternalCacheInfo.Enabled = false;
+                    chkCountMissShifts.Enabled = false;
                     btnReset.Enabled = false;
                     RaceTrackLogic logic = cmbImplement.SelectedItem as RaceTrackLogic;
                     bool countMissShifts = chkCountMissShifts.Checked;
@@ -249,9 +305,17 @@ namespace csRaceTrack
         {
             foreach (Control ctrl in grpControlPanel.Controls)
                 ctrl.Enabled = false;
-            cmbImplement.Items.Add(new BaseLine());
-            cmbImplement.Items.Add(new Naive());
+
+            // 找到所有实现并加入列表
+            foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
+            {
+                if (t.IsSubclassOf(typeof(RaceTrackLogic)))
+                    cmbImplement.Items.Add(t.GetConstructor(Type.EmptyTypes).Invoke(new object[0]));
+            }
             cmbImplement.SelectedIndex = 0;
+
+            foreach (object o in cmbImplement.Items)
+                chklstComparedImplementations.Items.Add(o);
 
             lstGroupView.Columns.Add(new ColumnHeader { Text = "偏移" });
             for (int i = 0; i < RaceTrackStatics.DOMAIN_PER_TRACK; i++)
@@ -285,6 +349,63 @@ namespace csRaceTrack
         private void btnRefreshGroupView_Click(object sender, EventArgs e)
         {
             (cmbImplement.SelectedItem as RaceTrackLogic).UpdateView(lstGroupView, int.Parse(cmbGroupView.Text));
+        }
+
+        bool inComparisionMode = false;
+        int cmp_currentLogicID = 0;
+        struct Result
+        {
+            public int shiftCount, rwCount, readMissCount;
+            public string implementationName, traceName;
+        }
+        Result[] compareResults;
+        private void btnCompareBegin_Click(object sender, EventArgs e)
+        {
+            chklstComparedImplementations.Enabled = false;
+            btnCompareBegin.Enabled = false;
+            chkFastMode.Checked = true;
+            inComparisionMode = true;
+            cmp_currentLogicID = 0;
+            compareResults = new Result[chklstComparedImplementations.CheckedIndices.Count * ofdTrace.FileNames.Length];
+            cmbImplement.SelectedIndex = chklstComparedImplementations.CheckedIndices[0];
+            btnReset_Click(null, null);
+            btnPlay_Click(null, null);
+        }
+
+        private void btnExportCSV_Click(object sender, EventArgs e)
+        {
+            if (sfdExportCSV.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+            using (StreamWriter sw = new StreamWriter(sfdExportCSV.FileName, false, Encoding.UTF8))
+            {
+                StringBuilder sb = new StringBuilder("Trace,名称,Shift次数,读写次数,读Miss次数").Append(Environment.NewLine);
+                foreach (Result r in compareResults)
+                    sb.Append(r.traceName).Append(',')
+                        .Append(r.implementationName).Append(',')
+                        .Append(r.shiftCount).Append(',')
+                        .Append(r.rwCount).Append(',')
+                        .Append(r.readMissCount).Append(Environment.NewLine);
+                sw.Write(sb.ToString());
+            }
+        }
+
+        private void mnuChkLstComparedImplementations_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (e.ClickedItem.Name == "mnuSelectAll")
+            {
+                for (int i = 0; i < chklstComparedImplementations.Items.Count; i++)
+                    chklstComparedImplementations.SetItemChecked(i, true);
+            }
+            else
+            {
+                for (int i = 0; i < chklstComparedImplementations.Items.Count; i++)
+                    chklstComparedImplementations.SetItemChecked(i, false);
+            }
+        }
+
+        private void chkExternalCacheInfo_CheckedChanged(object sender, EventArgs e)
+        {
+            RaceTrackLogic.externalCacheInfo = chkExternalCacheInfo.Checked;
         }
     }
 }

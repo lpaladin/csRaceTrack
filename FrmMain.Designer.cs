@@ -17,6 +17,12 @@
             {
                 components.Dispose();
             }
+            try { srTraceReader.Close(); }
+            catch { }
+            try { bs.Close(); }
+            catch { }
+            try { fs.Close(); }
+            catch { }
             base.Dispose(disposing);
         }
 
@@ -33,30 +39,42 @@
             this.lstLog = new System.Windows.Forms.ListBox();
             this.lstTrace = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.txtPath = new System.Windows.Forms.TextBox();
-            this.btnBrowse = new System.Windows.Forms.Button();
             this.grpControlPanel = new System.Windows.Forms.GroupBox();
-            this.ofdTrace = new System.Windows.Forms.OpenFileDialog();
-            this.btnPlay = new System.Windows.Forms.Button();
-            this.btnStep = new System.Windows.Forms.Button();
-            this.cmbImplement = new System.Windows.Forms.ComboBox();
+            this.grpComparision = new System.Windows.Forms.GroupBox();
+            this.chklstComparedImplementations = new System.Windows.Forms.CheckedListBox();
+            this.mnuChkLstComparedImplementations = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuSelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuUnSelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.chkFastMode = new System.Windows.Forms.CheckBox();
+            this.chkExternalCacheInfo = new System.Windows.Forms.CheckBox();
+            this.chkCountMissShifts = new System.Windows.Forms.CheckBox();
+            this.cmbGroupView = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnReset = new System.Windows.Forms.Button();
+            this.cmbImplement = new System.Windows.Forms.ComboBox();
+            this.ofdTrace = new System.Windows.Forms.OpenFileDialog();
             this.timTracePlay = new System.Windows.Forms.Timer(this.components);
             this.lstGroupView = new System.Windows.Forms.ListView();
-            this.cmbGroupView = new System.Windows.Forms.ComboBox();
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.lblShiftCount = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblRWCount = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblCacheReadMiss = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sfdExportCSV = new System.Windows.Forms.SaveFileDialog();
+            this.ttCheckedListHint = new System.Windows.Forms.ToolTip(this.components);
+            this.btnExportCSV = new System.Windows.Forms.Button();
+            this.btnCompareBegin = new System.Windows.Forms.Button();
             this.btnRefreshGroupView = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.chkCountMissShifts = new System.Windows.Forms.CheckBox();
-            this.chkFastMode = new System.Windows.Forms.CheckBox();
+            this.btnReset = new System.Windows.Forms.Button();
+            this.btnStep = new System.Windows.Forms.Button();
+            this.btnPlay = new System.Windows.Forms.Button();
+            this.btnBrowse = new System.Windows.Forms.Button();
             this.grpControlPanel.SuspendLayout();
+            this.grpComparision.SuspendLayout();
+            this.mnuChkLstComparedImplementations.SuspendLayout();
             this.statusBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -67,10 +85,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstLog.FormattingEnabled = true;
             this.lstLog.ItemHeight = 18;
-            this.lstLog.Location = new System.Drawing.Point(0, 463);
+            this.lstLog.Location = new System.Drawing.Point(0, 500);
             this.lstLog.Name = "lstLog";
-            this.lstLog.Size = new System.Drawing.Size(794, 238);
+            this.lstLog.Size = new System.Drawing.Size(1012, 256);
             this.lstLog.TabIndex = 0;
+            this.ttCheckedListHint.SetToolTip(this.lstLog, "这里是日志区");
             // 
             // lstTrace
             // 
@@ -86,8 +105,9 @@
             this.lstTrace.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstTrace.Location = new System.Drawing.Point(0, 183);
             this.lstTrace.Name = "lstTrace";
-            this.lstTrace.Size = new System.Drawing.Size(497, 267);
+            this.lstTrace.Size = new System.Drawing.Size(472, 311);
             this.lstTrace.TabIndex = 1;
+            this.ttCheckedListHint.SetToolTip(this.lstTrace, "这里是非精简模式下的Trace内容");
             this.lstTrace.UseCompatibleStateImageBehavior = false;
             this.lstTrace.View = System.Windows.Forms.View.Details;
             // 
@@ -95,6 +115,11 @@
             // 
             this.columnHeader1.Text = "#";
             this.columnHeader1.Width = 40;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "时间戳";
+            this.columnHeader4.Width = 109;
             // 
             // columnHeader2
             // 
@@ -106,36 +131,22 @@
             this.columnHeader3.Text = "地址";
             this.columnHeader3.Width = 261;
             // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "时间戳";
-            this.columnHeader4.Width = 109;
-            // 
             // txtPath
             // 
             this.txtPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPath.Location = new System.Drawing.Point(0, 1);
+            this.txtPath.Location = new System.Drawing.Point(0, 2);
             this.txtPath.Name = "txtPath";
             this.txtPath.ReadOnly = true;
-            this.txtPath.Size = new System.Drawing.Size(741, 28);
+            this.txtPath.Size = new System.Drawing.Size(960, 28);
             this.txtPath.TabIndex = 3;
-            // 
-            // btnBrowse
-            // 
-            this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.Location = new System.Drawing.Point(747, 1);
-            this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(47, 28);
-            this.btnBrowse.TabIndex = 4;
-            this.btnBrowse.Text = "...";
-            this.btnBrowse.UseVisualStyleBackColor = true;
-            this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // grpControlPanel
             // 
             this.grpControlPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpControlPanel.Controls.Add(this.grpComparision);
             this.grpControlPanel.Controls.Add(this.chkFastMode);
+            this.grpControlPanel.Controls.Add(this.chkExternalCacheInfo);
             this.grpControlPanel.Controls.Add(this.chkCountMissShifts);
             this.grpControlPanel.Controls.Add(this.cmbGroupView);
             this.grpControlPanel.Controls.Add(this.label2);
@@ -145,45 +156,111 @@
             this.grpControlPanel.Controls.Add(this.btnReset);
             this.grpControlPanel.Controls.Add(this.btnStep);
             this.grpControlPanel.Controls.Add(this.btnPlay);
-            this.grpControlPanel.Location = new System.Drawing.Point(503, 183);
+            this.grpControlPanel.Location = new System.Drawing.Point(478, 183);
             this.grpControlPanel.Name = "grpControlPanel";
-            this.grpControlPanel.Size = new System.Drawing.Size(291, 267);
+            this.grpControlPanel.Size = new System.Drawing.Size(534, 311);
             this.grpControlPanel.TabIndex = 5;
             this.grpControlPanel.TabStop = false;
             this.grpControlPanel.Text = "控制";
             // 
-            // ofdTrace
+            // grpComparision
             // 
-            this.ofdTrace.Filter = "Trace 文件|*.trace";
+            this.grpComparision.Controls.Add(this.chklstComparedImplementations);
+            this.grpComparision.Controls.Add(this.btnExportCSV);
+            this.grpComparision.Controls.Add(this.btnCompareBegin);
+            this.grpComparision.Location = new System.Drawing.Point(291, 27);
+            this.grpComparision.Name = "grpComparision";
+            this.grpComparision.Size = new System.Drawing.Size(231, 284);
+            this.grpComparision.TabIndex = 6;
+            this.grpComparision.TabStop = false;
+            this.grpComparision.Text = "对比实验和结果导出";
             // 
-            // btnPlay
+            // chklstComparedImplementations
             // 
-            this.btnPlay.Location = new System.Drawing.Point(9, 147);
-            this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(276, 34);
-            this.btnPlay.TabIndex = 0;
-            this.btnPlay.Text = "运行";
-            this.btnPlay.UseVisualStyleBackColor = true;
-            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
+            this.chklstComparedImplementations.CheckOnClick = true;
+            this.chklstComparedImplementations.ContextMenuStrip = this.mnuChkLstComparedImplementations;
+            this.chklstComparedImplementations.FormattingEnabled = true;
+            this.chklstComparedImplementations.Location = new System.Drawing.Point(6, 27);
+            this.chklstComparedImplementations.Name = "chklstComparedImplementations";
+            this.chklstComparedImplementations.Size = new System.Drawing.Size(218, 165);
+            this.chklstComparedImplementations.TabIndex = 1;
+            this.ttCheckedListHint.SetToolTip(this.chklstComparedImplementations, "点击右键可以全选或不选");
             // 
-            // btnStep
+            // mnuChkLstComparedImplementations
             // 
-            this.btnStep.Location = new System.Drawing.Point(9, 187);
-            this.btnStep.Name = "btnStep";
-            this.btnStep.Size = new System.Drawing.Size(276, 34);
-            this.btnStep.TabIndex = 0;
-            this.btnStep.Text = "单步";
-            this.btnStep.UseVisualStyleBackColor = true;
-            this.btnStep.Click += new System.EventHandler(this.btnStep_Click);
+            this.mnuChkLstComparedImplementations.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.mnuChkLstComparedImplementations.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuSelectAll,
+            this.mnuUnSelectAll});
+            this.mnuChkLstComparedImplementations.Name = "mnuChkLstComparedImplementations";
+            this.mnuChkLstComparedImplementations.Size = new System.Drawing.Size(135, 60);
+            this.mnuChkLstComparedImplementations.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.mnuChkLstComparedImplementations_ItemClicked);
             // 
-            // cmbImplement
+            // mnuSelectAll
             // 
-            this.cmbImplement.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbImplement.FormattingEnabled = true;
-            this.cmbImplement.Location = new System.Drawing.Point(84, 27);
-            this.cmbImplement.Name = "cmbImplement";
-            this.cmbImplement.Size = new System.Drawing.Size(195, 26);
-            this.cmbImplement.TabIndex = 1;
+            this.mnuSelectAll.Name = "mnuSelectAll";
+            this.mnuSelectAll.Size = new System.Drawing.Size(134, 28);
+            this.mnuSelectAll.Text = "全选";
+            // 
+            // mnuUnSelectAll
+            // 
+            this.mnuUnSelectAll.Name = "mnuUnSelectAll";
+            this.mnuUnSelectAll.Size = new System.Drawing.Size(134, 28);
+            this.mnuUnSelectAll.Text = "全不选";
+            // 
+            // chkFastMode
+            // 
+            this.chkFastMode.AutoSize = true;
+            this.chkFastMode.Location = new System.Drawing.Point(18, 92);
+            this.chkFastMode.Name = "chkFastMode";
+            this.chkFastMode.Size = new System.Drawing.Size(214, 22);
+            this.chkFastMode.TabIndex = 5;
+            this.chkFastMode.Text = "精简（高速）运行模式";
+            this.chkFastMode.UseVisualStyleBackColor = true;
+            // 
+            // chkExternalCacheInfo
+            // 
+            this.chkExternalCacheInfo.AutoSize = true;
+            this.chkExternalCacheInfo.Checked = true;
+            this.chkExternalCacheInfo.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkExternalCacheInfo.Location = new System.Drawing.Point(18, 146);
+            this.chkExternalCacheInfo.Name = "chkExternalCacheInfo";
+            this.chkExternalCacheInfo.Size = new System.Drawing.Size(259, 22);
+            this.chkExternalCacheInfo.TabIndex = 5;
+            this.chkExternalCacheInfo.Text = "允许在条带外存储Cache信息";
+            this.chkExternalCacheInfo.UseVisualStyleBackColor = true;
+            this.chkExternalCacheInfo.CheckedChanged += new System.EventHandler(this.chkExternalCacheInfo_CheckedChanged);
+            // 
+            // chkCountMissShifts
+            // 
+            this.chkCountMissShifts.AutoSize = true;
+            this.chkCountMissShifts.Checked = true;
+            this.chkCountMissShifts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkCountMissShifts.Location = new System.Drawing.Point(18, 118);
+            this.chkCountMissShifts.Name = "chkCountMissShifts";
+            this.chkCountMissShifts.Size = new System.Drawing.Size(268, 22);
+            this.chkCountMissShifts.TabIndex = 5;
+            this.chkCountMissShifts.Text = "Miss时的移动也计入移动次数";
+            this.chkCountMissShifts.UseVisualStyleBackColor = true;
+            // 
+            // cmbGroupView
+            // 
+            this.cmbGroupView.FormattingEnabled = true;
+            this.cmbGroupView.Location = new System.Drawing.Point(84, 58);
+            this.cmbGroupView.Name = "cmbGroupView";
+            this.cmbGroupView.Size = new System.Drawing.Size(142, 26);
+            this.cmbGroupView.TabIndex = 1;
+            this.ttCheckedListHint.SetToolTip(this.cmbGroupView, "这里确定你希望上方显示哪个条带组");
+            this.cmbGroupView.SelectedIndexChanged += new System.EventHandler(this.cmbGroupView_SelectedIndexChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 62);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(80, 18);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "观看组：";
             // 
             // label1
             // 
@@ -194,15 +271,20 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "实现：";
             // 
-            // btnReset
+            // cmbImplement
             // 
-            this.btnReset.Location = new System.Drawing.Point(9, 227);
-            this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(276, 34);
-            this.btnReset.TabIndex = 0;
-            this.btnReset.Text = "重置";
-            this.btnReset.UseVisualStyleBackColor = true;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            this.cmbImplement.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbImplement.FormattingEnabled = true;
+            this.cmbImplement.Location = new System.Drawing.Point(84, 27);
+            this.cmbImplement.Name = "cmbImplement";
+            this.cmbImplement.Size = new System.Drawing.Size(194, 26);
+            this.cmbImplement.TabIndex = 1;
+            // 
+            // ofdTrace
+            // 
+            this.ofdTrace.Filter = "Trace 文件|*.trace";
+            this.ofdTrace.Multiselect = true;
+            this.ofdTrace.Title = "打开 Trace 文件";
             // 
             // timTracePlay
             // 
@@ -214,96 +296,151 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstGroupView.FullRowSelect = true;
             this.lstGroupView.GridLines = true;
-            this.lstGroupView.Location = new System.Drawing.Point(0, 35);
+            this.lstGroupView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lstGroupView.Location = new System.Drawing.Point(0, 34);
             this.lstGroupView.Name = "lstGroupView";
-            this.lstGroupView.Size = new System.Drawing.Size(794, 142);
+            this.lstGroupView.Size = new System.Drawing.Size(1012, 142);
             this.lstGroupView.TabIndex = 6;
+            this.ttCheckedListHint.SetToolTip(this.lstGroupView, "这里显示了条带组的数据状况");
             this.lstGroupView.UseCompatibleStateImageBehavior = false;
             this.lstGroupView.View = System.Windows.Forms.View.Details;
             // 
-            // cmbGroupView
-            // 
-            this.cmbGroupView.FormattingEnabled = true;
-            this.cmbGroupView.Location = new System.Drawing.Point(84, 59);
-            this.cmbGroupView.Name = "cmbGroupView";
-            this.cmbGroupView.Size = new System.Drawing.Size(142, 26);
-            this.cmbGroupView.TabIndex = 1;
-            this.cmbGroupView.SelectedIndexChanged += new System.EventHandler(this.cmbGroupView_SelectedIndexChanged);
-            // 
             // statusBar
             // 
+            this.statusBar.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblShiftCount,
             this.lblRWCount,
             this.lblCacheReadMiss});
-            this.statusBar.Location = new System.Drawing.Point(0, 705);
+            this.statusBar.Location = new System.Drawing.Point(0, 766);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(794, 22);
+            this.statusBar.Padding = new System.Windows.Forms.Padding(2, 0, 14, 0);
+            this.statusBar.Size = new System.Drawing.Size(1012, 29);
             this.statusBar.TabIndex = 7;
             this.statusBar.Text = "statusStrip1";
             // 
             // lblShiftCount
             // 
             this.lblShiftCount.Name = "lblShiftCount";
-            this.lblShiftCount.Size = new System.Drawing.Size(75, 17);
+            this.lblShiftCount.Size = new System.Drawing.Size(111, 24);
             this.lblShiftCount.Text = "移动次数：0";
             // 
             // lblRWCount
             // 
             this.lblRWCount.Name = "lblRWCount";
-            this.lblRWCount.Size = new System.Drawing.Size(75, 17);
+            this.lblRWCount.Size = new System.Drawing.Size(111, 24);
             this.lblRWCount.Text = "读写次数：0";
             // 
             // lblCacheReadMiss
             // 
             this.lblCacheReadMiss.Name = "lblCacheReadMiss";
-            this.lblCacheReadMiss.Size = new System.Drawing.Size(90, 17);
+            this.lblCacheReadMiss.Size = new System.Drawing.Size(132, 24);
             this.lblCacheReadMiss.Text = "读Miss次数：0";
+            // 
+            // sfdExportCSV
+            // 
+            this.sfdExportCSV.Filter = "逗号分隔表|*.csv";
+            this.sfdExportCSV.Title = "指定要保存到的逗号分隔表";
+            // 
+            // ttCheckedListHint
+            // 
+            this.ttCheckedListHint.AutomaticDelay = 0;
+            this.ttCheckedListHint.AutoPopDelay = 5000;
+            this.ttCheckedListHint.InitialDelay = 1;
+            this.ttCheckedListHint.IsBalloon = true;
+            this.ttCheckedListHint.ReshowDelay = 100;
+            this.ttCheckedListHint.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.ttCheckedListHint.ToolTipTitle = "提示";
+            // 
+            // btnExportCSV
+            // 
+            this.btnExportCSV.Image = global::csRaceTrack.Properties.Resources.saveHS;
+            this.btnExportCSV.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnExportCSV.Location = new System.Drawing.Point(5, 239);
+            this.btnExportCSV.Name = "btnExportCSV";
+            this.btnExportCSV.Size = new System.Drawing.Size(219, 36);
+            this.btnExportCSV.TabIndex = 0;
+            this.btnExportCSV.Text = "导出为CSV文件";
+            this.btnExportCSV.UseVisualStyleBackColor = true;
+            this.btnExportCSV.Click += new System.EventHandler(this.btnExportCSV_Click);
+            // 
+            // btnCompareBegin
+            // 
+            this.btnCompareBegin.Image = global::csRaceTrack.Properties.Resources.PlayHS;
+            this.btnCompareBegin.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCompareBegin.Location = new System.Drawing.Point(5, 199);
+            this.btnCompareBegin.Name = "btnCompareBegin";
+            this.btnCompareBegin.Size = new System.Drawing.Size(219, 34);
+            this.btnCompareBegin.TabIndex = 0;
+            this.btnCompareBegin.Text = "批量运行";
+            this.ttCheckedListHint.SetToolTip(this.btnCompareBegin, "对每个文件运行以上所有实现");
+            this.btnCompareBegin.UseVisualStyleBackColor = true;
+            this.btnCompareBegin.Click += new System.EventHandler(this.btnCompareBegin_Click);
             // 
             // btnRefreshGroupView
             // 
             this.btnRefreshGroupView.Image = global::csRaceTrack.Properties.Resources._112_RefreshArrow_Green_16x16_72;
-            this.btnRefreshGroupView.Location = new System.Drawing.Point(232, 59);
+            this.btnRefreshGroupView.Location = new System.Drawing.Point(232, 58);
             this.btnRefreshGroupView.Name = "btnRefreshGroupView";
-            this.btnRefreshGroupView.Size = new System.Drawing.Size(47, 42);
+            this.btnRefreshGroupView.Size = new System.Drawing.Size(46, 42);
             this.btnRefreshGroupView.TabIndex = 3;
             this.btnRefreshGroupView.UseVisualStyleBackColor = true;
             this.btnRefreshGroupView.Click += new System.EventHandler(this.btnRefreshGroupView_Click);
             // 
-            // label2
+            // btnReset
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 62);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(80, 18);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "观看组：";
+            this.btnReset.Image = global::csRaceTrack.Properties.Resources.RestartHS;
+            this.btnReset.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnReset.Location = new System.Drawing.Point(6, 267);
+            this.btnReset.Name = "btnReset";
+            this.btnReset.Size = new System.Drawing.Size(276, 34);
+            this.btnReset.TabIndex = 0;
+            this.btnReset.Text = "重置";
+            this.ttCheckedListHint.SetToolTip(this.btnReset, "重置RaceTrack状态并清空所有记录");
+            this.btnReset.UseVisualStyleBackColor = true;
+            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
-            // chkCountMissShifts
+            // btnStep
             // 
-            this.chkCountMissShifts.AutoSize = true;
-            this.chkCountMissShifts.Location = new System.Drawing.Point(18, 119);
-            this.chkCountMissShifts.Name = "chkCountMissShifts";
-            this.chkCountMissShifts.Size = new System.Drawing.Size(261, 22);
-            this.chkCountMissShifts.TabIndex = 5;
-            this.chkCountMissShifts.Text = "Miss时的移动也计入移动次数";
-            this.chkCountMissShifts.UseVisualStyleBackColor = true;
+            this.btnStep.Image = global::csRaceTrack.Properties.Resources.GoToNextHS;
+            this.btnStep.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnStep.Location = new System.Drawing.Point(6, 229);
+            this.btnStep.Name = "btnStep";
+            this.btnStep.Size = new System.Drawing.Size(276, 34);
+            this.btnStep.TabIndex = 0;
+            this.btnStep.Text = "单步";
+            this.btnStep.UseVisualStyleBackColor = true;
+            this.btnStep.Click += new System.EventHandler(this.btnStep_Click);
             // 
-            // chkFastMode
+            // btnPlay
             // 
-            this.chkFastMode.AutoSize = true;
-            this.chkFastMode.Location = new System.Drawing.Point(18, 91);
-            this.chkFastMode.Name = "chkFastMode";
-            this.chkFastMode.Size = new System.Drawing.Size(207, 22);
-            this.chkFastMode.TabIndex = 5;
-            this.chkFastMode.Text = "精简（高速）运行模式";
-            this.chkFastMode.UseVisualStyleBackColor = true;
+            this.btnPlay.Image = global::csRaceTrack.Properties.Resources.PlayHS;
+            this.btnPlay.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPlay.Location = new System.Drawing.Point(6, 188);
+            this.btnPlay.Name = "btnPlay";
+            this.btnPlay.Size = new System.Drawing.Size(276, 34);
+            this.btnPlay.TabIndex = 0;
+            this.btnPlay.Text = "运行";
+            this.btnPlay.UseVisualStyleBackColor = true;
+            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
+            // 
+            // btnBrowse
+            // 
+            this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBrowse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBrowse.Image = global::csRaceTrack.Properties.Resources.OpenSelectedItemHS;
+            this.btnBrowse.Location = new System.Drawing.Point(964, 2);
+            this.btnBrowse.Name = "btnBrowse";
+            this.btnBrowse.Size = new System.Drawing.Size(46, 28);
+            this.btnBrowse.TabIndex = 4;
+            this.btnBrowse.UseVisualStyleBackColor = true;
+            this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(794, 727);
+            this.ClientSize = new System.Drawing.Size(1012, 795);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.lstGroupView);
             this.Controls.Add(this.grpControlPanel);
@@ -313,10 +450,12 @@
             this.Controls.Add(this.lstLog);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FrmMain";
-            this.Text = "RaceTrack模拟器";
+            this.Text = "RaceTrack模拟器 - 周昊宇 / 1200012823";
             this.Load += new System.EventHandler(this.FrmMain_Load);
             this.grpControlPanel.ResumeLayout(false);
             this.grpControlPanel.PerformLayout();
+            this.grpComparision.ResumeLayout(false);
+            this.mnuChkLstComparedImplementations.ResumeLayout(false);
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
             this.ResumeLayout(false);
@@ -352,6 +491,16 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkFastMode;
         private System.Windows.Forms.CheckBox chkCountMissShifts;
+        private System.Windows.Forms.GroupBox grpComparision;
+        private System.Windows.Forms.Button btnExportCSV;
+        private System.Windows.Forms.CheckedListBox chklstComparedImplementations;
+        private System.Windows.Forms.Button btnCompareBegin;
+        private System.Windows.Forms.SaveFileDialog sfdExportCSV;
+        private System.Windows.Forms.ContextMenuStrip mnuChkLstComparedImplementations;
+        private System.Windows.Forms.ToolStripMenuItem mnuSelectAll;
+        private System.Windows.Forms.ToolStripMenuItem mnuUnSelectAll;
+        private System.Windows.Forms.ToolTip ttCheckedListHint;
+        private System.Windows.Forms.CheckBox chkExternalCacheInfo;
     }
 }
 

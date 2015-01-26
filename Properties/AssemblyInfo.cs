@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("csRaceTrack")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("RaceTrack模拟器")]
+[assembly: AssemblyDescription("1200012823")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("周昊宇")]
 [assembly: AssemblyProduct("csRaceTrack")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright © 周昊宇 / 1200012823 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
