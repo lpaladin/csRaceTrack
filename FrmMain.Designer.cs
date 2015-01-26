@@ -49,13 +49,19 @@
             this.mnuChkLstComparedImplementations = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuUnSelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnExportCSV = new System.Windows.Forms.Button();
+            this.btnCompareBegin = new System.Windows.Forms.Button();
             this.chkFastMode = new System.Windows.Forms.CheckBox();
             this.chkExternalCacheInfo = new System.Windows.Forms.CheckBox();
             this.chkCountMissShifts = new System.Windows.Forms.CheckBox();
             this.cmbGroupView = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnRefreshGroupView = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.cmbImplement = new System.Windows.Forms.ComboBox();
+            this.btnReset = new System.Windows.Forms.Button();
+            this.btnStep = new System.Windows.Forms.Button();
+            this.btnPlay = new System.Windows.Forms.Button();
             this.ofdTrace = new System.Windows.Forms.OpenFileDialog();
             this.timTracePlay = new System.Windows.Forms.Timer(this.components);
             this.lstGroupView = new System.Windows.Forms.ListView();
@@ -65,13 +71,8 @@
             this.lblCacheReadMiss = new System.Windows.Forms.ToolStripStatusLabel();
             this.sfdExportCSV = new System.Windows.Forms.SaveFileDialog();
             this.ttCheckedListHint = new System.Windows.Forms.ToolTip(this.components);
-            this.btnExportCSV = new System.Windows.Forms.Button();
-            this.btnCompareBegin = new System.Windows.Forms.Button();
-            this.btnRefreshGroupView = new System.Windows.Forms.Button();
-            this.btnReset = new System.Windows.Forms.Button();
-            this.btnStep = new System.Windows.Forms.Button();
-            this.btnPlay = new System.Windows.Forms.Button();
             this.btnBrowse = new System.Windows.Forms.Button();
+            this.lblRCount = new System.Windows.Forms.ToolStripStatusLabel();
             this.grpControlPanel.SuspendLayout();
             this.grpComparision.SuspendLayout();
             this.mnuChkLstComparedImplementations.SuspendLayout();
@@ -208,6 +209,31 @@
             this.mnuUnSelectAll.Size = new System.Drawing.Size(134, 28);
             this.mnuUnSelectAll.Text = "全不选";
             // 
+            // btnExportCSV
+            // 
+            this.btnExportCSV.Image = global::csRaceTrack.Properties.Resources.saveHS;
+            this.btnExportCSV.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnExportCSV.Location = new System.Drawing.Point(5, 239);
+            this.btnExportCSV.Name = "btnExportCSV";
+            this.btnExportCSV.Size = new System.Drawing.Size(219, 36);
+            this.btnExportCSV.TabIndex = 0;
+            this.btnExportCSV.Text = "导出为CSV文件";
+            this.btnExportCSV.UseVisualStyleBackColor = true;
+            this.btnExportCSV.Click += new System.EventHandler(this.btnExportCSV_Click);
+            // 
+            // btnCompareBegin
+            // 
+            this.btnCompareBegin.Image = global::csRaceTrack.Properties.Resources.PlayHS;
+            this.btnCompareBegin.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCompareBegin.Location = new System.Drawing.Point(5, 199);
+            this.btnCompareBegin.Name = "btnCompareBegin";
+            this.btnCompareBegin.Size = new System.Drawing.Size(219, 34);
+            this.btnCompareBegin.TabIndex = 0;
+            this.btnCompareBegin.Text = "批量运行";
+            this.ttCheckedListHint.SetToolTip(this.btnCompareBegin, "对每个文件运行以上所有实现");
+            this.btnCompareBegin.UseVisualStyleBackColor = true;
+            this.btnCompareBegin.Click += new System.EventHandler(this.btnCompareBegin_Click);
+            // 
             // chkFastMode
             // 
             this.chkFastMode.AutoSize = true;
@@ -262,6 +288,16 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "观看组：";
             // 
+            // btnRefreshGroupView
+            // 
+            this.btnRefreshGroupView.Image = global::csRaceTrack.Properties.Resources._112_RefreshArrow_Green_16x16_72;
+            this.btnRefreshGroupView.Location = new System.Drawing.Point(232, 58);
+            this.btnRefreshGroupView.Name = "btnRefreshGroupView";
+            this.btnRefreshGroupView.Size = new System.Drawing.Size(46, 42);
+            this.btnRefreshGroupView.TabIndex = 3;
+            this.btnRefreshGroupView.UseVisualStyleBackColor = true;
+            this.btnRefreshGroupView.Click += new System.EventHandler(this.btnRefreshGroupView_Click);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -279,6 +315,43 @@
             this.cmbImplement.Name = "cmbImplement";
             this.cmbImplement.Size = new System.Drawing.Size(194, 26);
             this.cmbImplement.TabIndex = 1;
+            // 
+            // btnReset
+            // 
+            this.btnReset.Image = global::csRaceTrack.Properties.Resources.RestartHS;
+            this.btnReset.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnReset.Location = new System.Drawing.Point(6, 267);
+            this.btnReset.Name = "btnReset";
+            this.btnReset.Size = new System.Drawing.Size(276, 34);
+            this.btnReset.TabIndex = 0;
+            this.btnReset.Text = "重置";
+            this.ttCheckedListHint.SetToolTip(this.btnReset, "重置RaceTrack状态并清空所有记录");
+            this.btnReset.UseVisualStyleBackColor = true;
+            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            // 
+            // btnStep
+            // 
+            this.btnStep.Image = global::csRaceTrack.Properties.Resources.GoToNextHS;
+            this.btnStep.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnStep.Location = new System.Drawing.Point(6, 229);
+            this.btnStep.Name = "btnStep";
+            this.btnStep.Size = new System.Drawing.Size(276, 34);
+            this.btnStep.TabIndex = 0;
+            this.btnStep.Text = "单步";
+            this.btnStep.UseVisualStyleBackColor = true;
+            this.btnStep.Click += new System.EventHandler(this.btnStep_Click);
+            // 
+            // btnPlay
+            // 
+            this.btnPlay.Image = global::csRaceTrack.Properties.Resources.PlayHS;
+            this.btnPlay.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPlay.Location = new System.Drawing.Point(6, 188);
+            this.btnPlay.Name = "btnPlay";
+            this.btnPlay.Size = new System.Drawing.Size(276, 34);
+            this.btnPlay.TabIndex = 0;
+            this.btnPlay.Text = "运行";
+            this.btnPlay.UseVisualStyleBackColor = true;
+            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
             // 
             // ofdTrace
             // 
@@ -311,6 +384,7 @@
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblShiftCount,
             this.lblRWCount,
+            this.lblRCount,
             this.lblCacheReadMiss});
             this.statusBar.Location = new System.Drawing.Point(0, 766);
             this.statusBar.Name = "statusBar";
@@ -352,78 +426,6 @@
             this.ttCheckedListHint.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.ttCheckedListHint.ToolTipTitle = "提示";
             // 
-            // btnExportCSV
-            // 
-            this.btnExportCSV.Image = global::csRaceTrack.Properties.Resources.saveHS;
-            this.btnExportCSV.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnExportCSV.Location = new System.Drawing.Point(5, 239);
-            this.btnExportCSV.Name = "btnExportCSV";
-            this.btnExportCSV.Size = new System.Drawing.Size(219, 36);
-            this.btnExportCSV.TabIndex = 0;
-            this.btnExportCSV.Text = "导出为CSV文件";
-            this.btnExportCSV.UseVisualStyleBackColor = true;
-            this.btnExportCSV.Click += new System.EventHandler(this.btnExportCSV_Click);
-            // 
-            // btnCompareBegin
-            // 
-            this.btnCompareBegin.Image = global::csRaceTrack.Properties.Resources.PlayHS;
-            this.btnCompareBegin.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCompareBegin.Location = new System.Drawing.Point(5, 199);
-            this.btnCompareBegin.Name = "btnCompareBegin";
-            this.btnCompareBegin.Size = new System.Drawing.Size(219, 34);
-            this.btnCompareBegin.TabIndex = 0;
-            this.btnCompareBegin.Text = "批量运行";
-            this.ttCheckedListHint.SetToolTip(this.btnCompareBegin, "对每个文件运行以上所有实现");
-            this.btnCompareBegin.UseVisualStyleBackColor = true;
-            this.btnCompareBegin.Click += new System.EventHandler(this.btnCompareBegin_Click);
-            // 
-            // btnRefreshGroupView
-            // 
-            this.btnRefreshGroupView.Image = global::csRaceTrack.Properties.Resources._112_RefreshArrow_Green_16x16_72;
-            this.btnRefreshGroupView.Location = new System.Drawing.Point(232, 58);
-            this.btnRefreshGroupView.Name = "btnRefreshGroupView";
-            this.btnRefreshGroupView.Size = new System.Drawing.Size(46, 42);
-            this.btnRefreshGroupView.TabIndex = 3;
-            this.btnRefreshGroupView.UseVisualStyleBackColor = true;
-            this.btnRefreshGroupView.Click += new System.EventHandler(this.btnRefreshGroupView_Click);
-            // 
-            // btnReset
-            // 
-            this.btnReset.Image = global::csRaceTrack.Properties.Resources.RestartHS;
-            this.btnReset.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnReset.Location = new System.Drawing.Point(6, 267);
-            this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(276, 34);
-            this.btnReset.TabIndex = 0;
-            this.btnReset.Text = "重置";
-            this.ttCheckedListHint.SetToolTip(this.btnReset, "重置RaceTrack状态并清空所有记录");
-            this.btnReset.UseVisualStyleBackColor = true;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
-            // 
-            // btnStep
-            // 
-            this.btnStep.Image = global::csRaceTrack.Properties.Resources.GoToNextHS;
-            this.btnStep.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnStep.Location = new System.Drawing.Point(6, 229);
-            this.btnStep.Name = "btnStep";
-            this.btnStep.Size = new System.Drawing.Size(276, 34);
-            this.btnStep.TabIndex = 0;
-            this.btnStep.Text = "单步";
-            this.btnStep.UseVisualStyleBackColor = true;
-            this.btnStep.Click += new System.EventHandler(this.btnStep_Click);
-            // 
-            // btnPlay
-            // 
-            this.btnPlay.Image = global::csRaceTrack.Properties.Resources.PlayHS;
-            this.btnPlay.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnPlay.Location = new System.Drawing.Point(6, 188);
-            this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(276, 34);
-            this.btnPlay.TabIndex = 0;
-            this.btnPlay.Text = "运行";
-            this.btnPlay.UseVisualStyleBackColor = true;
-            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
-            // 
             // btnBrowse
             // 
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -435,6 +437,12 @@
             this.btnBrowse.TabIndex = 4;
             this.btnBrowse.UseVisualStyleBackColor = true;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
+            // 
+            // lblRCount
+            // 
+            this.lblRCount.Name = "lblRCount";
+            this.lblRCount.Size = new System.Drawing.Size(93, 24);
+            this.lblRCount.Text = "读次数：0";
             // 
             // FrmMain
             // 
@@ -501,6 +509,7 @@
         private System.Windows.Forms.ToolStripMenuItem mnuUnSelectAll;
         private System.Windows.Forms.ToolTip ttCheckedListHint;
         private System.Windows.Forms.CheckBox chkExternalCacheInfo;
+        private System.Windows.Forms.ToolStripStatusLabel lblRCount;
     }
 }
 

@@ -23,7 +23,7 @@ namespace csRaceTrack
         /// Trace列表容纳大小
         /// </summary>
         const int TRACE_WINDOW_SIZE = 10;
-        int traceCount = 0, readMissCount = 0, shiftCount = 0, rwCount = 0;
+        int traceCount = 0, readMissCount = 0, shiftCount = 0, rwCount = 0, rCount = 0;
         Queue<Trace> traces;
 
         public FrmMain()
@@ -74,9 +74,10 @@ namespace csRaceTrack
             RaceTrackLogic logic = cmbImplement.SelectedItem as RaceTrackLogic;
             try
             {
-                logic.ProcessTrace(traces.Dequeue(), ref shiftCount, ref rwCount, chkCountMissShifts.Checked);
+                logic.ProcessTrace(traces.Dequeue(), ref shiftCount, ref rwCount, ref rCount, chkCountMissShifts.Checked);
                 lblShiftCount.Text = "移动次数：" + shiftCount;
                 lblRWCount.Text = "读写次数：" + rwCount;
+                lblRCount.Text = "读次数：" + rCount;
             }
             catch (RaceTrackLogic.CacheReadMissException)
             {
@@ -84,6 +85,7 @@ namespace csRaceTrack
                 lblCacheReadMiss.Text = "读Miss次数：" + ++readMissCount;
                 lblShiftCount.Text = "移动次数：" + shiftCount;
                 lblRWCount.Text = "读写次数：" + rwCount;
+                lblRCount.Text = "读次数：" + rCount;
             }
             catch (RaceTrackLogic.CacheCorruptException)
             {
@@ -122,10 +124,12 @@ namespace csRaceTrack
             timTracePlay.Stop();
             shiftCount = 0;
             rwCount = 0;
+            rCount = 0;
             readMissCount = 0;
             lblCacheReadMiss.Text = "读Miss次数：" + readMissCount;
             lblShiftCount.Text = "移动次数：" + shiftCount;
             lblRWCount.Text = "读写次数：" + rwCount;
+            lblRCount.Text = "读次数：" + rCount;
             fastPlayInProgress = false;
             if (srTraceReader != null)
             {
@@ -165,6 +169,7 @@ namespace csRaceTrack
             lblCacheReadMiss.Text = "读Miss次数：" + readMissCount;
             lblShiftCount.Text = "移动次数：" + shiftCount;
             lblRWCount.Text = "读写次数：" + rwCount;
+            lblRCount.Text = "读次数：" + rCount;
 
             if (inComparisionMode)
             {
@@ -173,6 +178,7 @@ namespace csRaceTrack
                     implementationName = RaceTrackLogic.currentLogic.ToString(),
                     shiftCount = shiftCount,
                     rwCount = rwCount,
+                    rCount = rCount,
                     readMissCount = readMissCount,
                     traceName = Path.GetFileName(ofdTrace.FileNames[currTraceFileID])
                 };
@@ -202,11 +208,13 @@ namespace csRaceTrack
                             .Append(r.implementationName).Append('\t')
                             .Append(r.shiftCount).Append('\t')
                             .Append(r.rwCount).Append('\t')
+                            .Append(r.rCount).Append('\t')
                             .Append(r.readMissCount);
                         Log(sb.ToString());
                     }
                     btnCompareBegin.Enabled = true;
                     chklstComparedImplementations.Enabled = true;
+                    inComparisionMode = false;
                 }
             }
 
@@ -261,7 +269,7 @@ namespace csRaceTrack
                             }
                             try
                             {
-                                logic.ProcessTrace(traces.Dequeue(), ref shiftCount, ref rwCount, countMissShifts);
+                                logic.ProcessTrace(traces.Dequeue(), ref shiftCount, ref rwCount, ref rCount, countMissShifts);
                             }
                             catch (RaceTrackLogic.CacheReadMissException)
                             {
@@ -355,7 +363,7 @@ namespace csRaceTrack
         int cmp_currentLogicID = 0;
         struct Result
         {
-            public int shiftCount, rwCount, readMissCount;
+            public int shiftCount, rwCount, rCount, readMissCount;
             public string implementationName, traceName;
         }
         Result[] compareResults;
@@ -378,12 +386,13 @@ namespace csRaceTrack
                 return;
             using (StreamWriter sw = new StreamWriter(sfdExportCSV.FileName, false, Encoding.UTF8))
             {
-                StringBuilder sb = new StringBuilder("Trace,名称,Shift次数,读写次数,读Miss次数").Append(Environment.NewLine);
+                StringBuilder sb = new StringBuilder("Trace,名称,Shift次数,读写次数,读次数,读Miss次数").Append(Environment.NewLine);
                 foreach (Result r in compareResults)
                     sb.Append(r.traceName).Append(',')
                         .Append(r.implementationName).Append(',')
                         .Append(r.shiftCount).Append(',')
                         .Append(r.rwCount).Append(',')
+                        .Append(r.rCount).Append(',')
                         .Append(r.readMissCount).Append(Environment.NewLine);
                 sw.Write(sb.ToString());
             }

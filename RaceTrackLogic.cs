@@ -72,7 +72,7 @@ namespace csRaceTrack
             get { if (externalCacheInfo) return blockInfo; else return null; }
         }
 
-        private int shiftAmount, rwCount;
+        private int shiftAmount, rwCount, rCount;
 
         /// <summary>
         /// 条带组。
@@ -141,6 +141,7 @@ namespace csRaceTrack
                 if (requests.Length > 4)
                     throw new ArgumentOutOfRangeException();
                 currentLogic.rwCount++;
+                currentLogic.rCount++;
                 foreach (RaceTrackGroupRWRequestBundle req in requests)
                 {
                     RaceTrackPort port = currentLogic.Ports[req.portID];
@@ -255,13 +256,14 @@ namespace csRaceTrack
         /// 处理一条Trace。
         /// </summary>
         /// <param name="t">要处理的Trace。</param>
-        public void ProcessTrace(Trace t, ref int shiftAmount, ref int rwCount, bool countMissShift)
+        public void ProcessTrace(Trace t, ref int shiftAmount, ref int rwCount, ref int rCount, bool countMissShift)
         {
             currentLogic = this;
 
             // 重置计数器
             this.shiftAmount = 0;
             this.rwCount = 0;
+            this.rCount = 0;
 
             // 执行操作
             t.address = t.address / RaceTrackStatics.TRACK_PER_GROUP * RaceTrackStatics.TRACK_PER_GROUP;
@@ -293,6 +295,7 @@ namespace csRaceTrack
             }
             shiftAmount += this.shiftAmount;
             rwCount += this.rwCount;
+            rCount += this.rCount;
         }
 
         /// <summary>
@@ -853,6 +856,84 @@ namespace csRaceTrack
     }
 
     /// <summary>
+    /// 读端口较优先布局。（四个写口一堆读口）
+    /// </summary>
+    public class ReadPriority : BaseLine
+    {
+        /// <summary>
+        /// 读写端口定义。
+        /// </summary>
+        private readonly RaceTrackPort[] ports = new RaceTrackPort[] {
+            new RaceTrackPort { position = 0, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 7, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
+            new RaceTrackPort { position = 12, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 16, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 23, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
+            new RaceTrackPort { position = 28, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 32, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 39, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
+            new RaceTrackPort { position = 44, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 48, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 55, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
+            new RaceTrackPort { position = 60, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+        };
+        protected override RaceTrackLogic.RaceTrackPort[] Ports
+        {
+            get { return ports; }
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "ReadPriority";
+        }
+    }
+
+    /// <summary>
+    /// 读端口超优先布局。（一个写口一堆读口）
+    /// </summary>
+    public class ReadSuperPriority : BaseLine
+    {
+        /// <summary>
+        /// 读写端口定义。
+        /// </summary>
+        private readonly RaceTrackPort[] ports = new RaceTrackPort[] {
+            new RaceTrackPort { position = 0, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 4, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 8, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 12, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 16, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 20, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 24, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 28, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠右
+            new RaceTrackPort { position = 32, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
+            new RaceTrackPort { position = 37, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 41, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 45, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 49, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 53, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 57, type = RaceTrackPort.PortType.ReadOnly },
+            new RaceTrackPort { position = 61, type = RaceTrackPort.PortType.ReadOnly }
+        };
+        protected override RaceTrackLogic.RaceTrackPort[] Ports
+        {
+            get { return ports; }
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "ReadSuperPriority";
+        }
+    }
+
+    /// <summary>
     /// 对Cache的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
     /// </summary>
     public class SetReordered : BaseLine
@@ -1183,6 +1264,126 @@ namespace csRaceTrack
         }
     }
 
+    /// <summary>
+    /// 对Naive的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
+    /// </summary>
+    public class N1SetReordered : Naive
+    {
+        protected override int GetSetIDFromAddress(int addr)
+        {
+            int setPerGroup = RaceTrackStatics.DOMAIN_PER_TRACK / RaceTrackStatics.ASSOCIATIVITY,
+                original = base.GetSetIDFromAddress(addr),
+                transformed = (original % setPerGroup) * RaceTrackStatics.GROUP_COUNT + original / setPerGroup;
+            mainForm.Log("Set重新编址：" + original + " -> " + transformed);
+            return transformed;
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "N1_SetReordered";
+        }
+    }
+
+    /// <summary>
+    /// 对Naive2的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
+    /// </summary>
+    public class N2SetReordered : Naive2
+    {
+        protected override int GetSetIDFromAddress(int addr)
+        {
+            int setPerGroup = RaceTrackStatics.DOMAIN_PER_TRACK / RaceTrackStatics.ASSOCIATIVITY,
+                original = base.GetSetIDFromAddress(addr),
+                transformed = (original % setPerGroup) * RaceTrackStatics.GROUP_COUNT + original / setPerGroup;
+            mainForm.Log("Set重新编址：" + original + " -> " + transformed);
+            return transformed;
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "N2_SetReordered";
+        }
+    }
+
+    /// <summary>
+    /// 对Naive4的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
+    /// </summary>
+    public class N4SetReordered : Naive4
+    {
+        protected override int GetSetIDFromAddress(int addr)
+        {
+            int setPerGroup = RaceTrackStatics.DOMAIN_PER_TRACK / RaceTrackStatics.ASSOCIATIVITY,
+                original = base.GetSetIDFromAddress(addr),
+                transformed = (original % setPerGroup) * RaceTrackStatics.GROUP_COUNT + original / setPerGroup;
+            mainForm.Log("Set重新编址：" + original + " -> " + transformed);
+            return transformed;
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "N4_SetReordered";
+        }
+    }
+
+    /// <summary>
+    /// 对RWPattern的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
+    /// </summary>
+    public class RWP1SetReordered : RWPattern
+    {
+        protected override int GetSetIDFromAddress(int addr)
+        {
+            int setPerGroup = RaceTrackStatics.DOMAIN_PER_TRACK / RaceTrackStatics.ASSOCIATIVITY,
+                original = base.GetSetIDFromAddress(addr),
+                transformed = (original % setPerGroup) * RaceTrackStatics.GROUP_COUNT + original / setPerGroup;
+            mainForm.Log("Set重新编址：" + original + " -> " + transformed);
+            return transformed;
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "RWP1_SetReordered";
+        }
+    }
+
+    /// <summary>
+    /// 对RWPattern2的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
+    /// </summary>
+    public class RWP2SetReordered : RWPattern2
+    {
+        protected override int GetSetIDFromAddress(int addr)
+        {
+            int setPerGroup = RaceTrackStatics.DOMAIN_PER_TRACK / RaceTrackStatics.ASSOCIATIVITY,
+                original = base.GetSetIDFromAddress(addr),
+                transformed = (original % setPerGroup) * RaceTrackStatics.GROUP_COUNT + original / setPerGroup;
+            mainForm.Log("Set重新编址：" + original + " -> " + transformed);
+            return transformed;
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "RWP2_SetReordered";
+        }
+    }
+
     #endregion
 
     #region 工具类
@@ -1211,6 +1412,54 @@ namespace csRaceTrack
         public override string ToString()
         {
             return "[" + timeStamp + "] " + (isRead ? "读 " : "写 ") + "0x" + Convert.ToString(address, 16);
+        }
+    }
+
+    /// <summary>
+    /// 对ReadPriority的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
+    /// </summary>
+    public class RPSetReordered : ReadPriority
+    {
+        protected override int GetSetIDFromAddress(int addr)
+        {
+            int setPerGroup = RaceTrackStatics.DOMAIN_PER_TRACK / RaceTrackStatics.ASSOCIATIVITY,
+                original = base.GetSetIDFromAddress(addr),
+                transformed = (original % setPerGroup) * RaceTrackStatics.GROUP_COUNT + original / setPerGroup;
+            mainForm.Log("Set重新编址：" + original + " -> " + transformed);
+            return transformed;
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "RP_SetReordered";
+        }
+    }
+
+    /// <summary>
+    /// 对ReadSuperPriority的Set进行重新编址，使得第一个条带组有原第0、128、256、……号Set。
+    /// </summary>
+    public class RSPSetReordered : ReadSuperPriority
+    {
+        protected override int GetSetIDFromAddress(int addr)
+        {
+            int setPerGroup = RaceTrackStatics.DOMAIN_PER_TRACK / RaceTrackStatics.ASSOCIATIVITY,
+                original = base.GetSetIDFromAddress(addr),
+                transformed = (original % setPerGroup) * RaceTrackStatics.GROUP_COUNT + original / setPerGroup;
+            mainForm.Log("Set重新编址：" + original + " -> " + transformed);
+            return transformed;
+        }
+
+        /// <summary>
+        /// 获取当前RaceTrack实现的名字。
+        /// </summary>
+        /// <returns>当前RaceTrack实现的名字。</returns>
+        public override string ToString()
+        {
+            return "RSP_SetReordered";
         }
     }
 
