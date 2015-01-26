@@ -864,18 +864,18 @@ namespace csRaceTrack
         /// 读写端口定义。
         /// </summary>
         private readonly RaceTrackPort[] ports = new RaceTrackPort[] {
-            new RaceTrackPort { position = 0, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
-            new RaceTrackPort { position = 7, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
-            new RaceTrackPort { position = 12, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
-            new RaceTrackPort { position = 16, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
-            new RaceTrackPort { position = 23, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
-            new RaceTrackPort { position = 28, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
-            new RaceTrackPort { position = 32, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
-            new RaceTrackPort { position = 39, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
-            new RaceTrackPort { position = 44, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
-            new RaceTrackPort { position = 48, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
-            new RaceTrackPort { position = 55, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
-            new RaceTrackPort { position = 60, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 0, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
+            new RaceTrackPort { position = 7, type = RaceTrackPort.PortType.WriteOnly }, // 端口探头居中
+            new RaceTrackPort { position = 12, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
+            new RaceTrackPort { position = 16, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
+            new RaceTrackPort { position = 23, type = RaceTrackPort.PortType.WriteOnly }, // 端口探头居中
+            new RaceTrackPort { position = 28, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
+            new RaceTrackPort { position = 32, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
+            new RaceTrackPort { position = 39, type = RaceTrackPort.PortType.WriteOnly }, // 端口探头居中
+            new RaceTrackPort { position = 44, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
+            new RaceTrackPort { position = 48, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
+            new RaceTrackPort { position = 55, type = RaceTrackPort.PortType.WriteOnly }, // 端口探头居中
+            new RaceTrackPort { position = 60, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
         };
         protected override RaceTrackLogic.RaceTrackPort[] Ports
         {
@@ -908,9 +908,9 @@ namespace csRaceTrack
             new RaceTrackPort { position = 16, type = RaceTrackPort.PortType.ReadOnly },
             new RaceTrackPort { position = 20, type = RaceTrackPort.PortType.ReadOnly },
             new RaceTrackPort { position = 24, type = RaceTrackPort.PortType.ReadOnly },
-            new RaceTrackPort { position = 28, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠右
-            new RaceTrackPort { position = 32, type = RaceTrackPort.PortType.WriteOnly }, // 端口居中
-            new RaceTrackPort { position = 37, type = RaceTrackPort.PortType.ReadOnly }, // 端口靠左
+            new RaceTrackPort { position = 28, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠右
+            new RaceTrackPort { position = 32, type = RaceTrackPort.PortType.WriteOnly }, // 端口探头居中
+            new RaceTrackPort { position = 37, type = RaceTrackPort.PortType.ReadOnly }, // 端口探头靠左
             new RaceTrackPort { position = 41, type = RaceTrackPort.PortType.ReadOnly },
             new RaceTrackPort { position = 45, type = RaceTrackPort.PortType.ReadOnly },
             new RaceTrackPort { position = 49, type = RaceTrackPort.PortType.ReadOnly },
